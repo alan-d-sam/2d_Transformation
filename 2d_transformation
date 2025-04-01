@@ -1,0 +1,88 @@
+import numpy as np
+ import matplotlib.pyplot as plt
+ 
+ # Function to generate vertices of a regular hexagon
+ def create_hexagon(center_x, center_y, size):
+ angles = np.linspace(0, 2 * np.pi, 7)  # 7 points to close the hexagon
+ x = center_x + size * np.cos(angles)
+ y = center_y + size * np.sin(angles)
+ return np.column_stack((x, y))  # Combine x and y into a single array
+ 
+ # Function to apply transformation matrix to vertices
+ def transform(vertices, matrix):
+ 
+ # Add homogeneous coordinate (x, y, 1)
+ homogeneous_vertices = np.hstack((vertices, np.ones((vertices.shape[0], 1))))
+ 
+ # Apply transformation
+ transformed_vertices = np.dot(homogeneous_vertices, matrix.T)
+ return transformed_vertices[:, :2]  # Remove homogeneous coordinate
+ 
+ # Translation matrix
+ def translation_matrix(tx, ty):
+ return np.array([
+ [1, 0, 0],
+ [0, 1, 0],
+ [tx, ty, 1]
+ ])
+ 
+ # Rotation matrix (angle in degrees)
+ def rotation_matrix(angle):
+ theta = np.radians(angle)
+ return np.array([
+ [np.cos(theta), -np.sin(theta), 0],
+ [np.sin(theta), np.cos(theta), 0],
+ [0, 0, 1]
+ ])
+ 
+ # Scaling matrix
+ def scaling_matrix(sx, sy):
+ return np.array([
+ [sx, 0, 0],
+ [0, sy, 0],
+ [0, 0, 1]
+ ])
+ 
+ # Composite transformation: Translate -> Rotate -> Scale
+ def composite_transformation(vertices, tx, ty, angle, sx, sy):
+ 
+ # Apply translation
+ translation = translation_matrix(tx, ty)
+ vertices = transform(vertices, translation)
+ 
+ # Apply rotation
+ rotation = rotation_matrix(angle)
+ vertices = transform(vertices, rotation)
+ 
+ # Apply scaling
+ scaling = scaling_matrix(sx, sy)
+ vertices = transform(vertices, scaling)
+ return vertices
+ 
+# Define hexagon parameters
+ center_x, center_y = 0, 0  # Center of the hexagon
+ size = 1  # Size of the hexagon
+ 
+ # Create hexagon vertices
+ hexagon_vertices = create_hexagon(center_x, center_y, size)
+ 
+ # Define transformation parameters
+ tx, ty = 4, 3  # Translation
+ angle = 52       
+ 
+# Rotation in degrees
+ sx, sy = 1, 2.5  # Scaling
+ 
+ # Apply composite transformation
+ transformed_hexagon = composite_transformation(hexagon_vertices, tx, ty, angle, sx, sy)
+ 
+ # Plot the original and transformed hexagon
+ plt.figure()
+ plt.plot(hexagon_vertices[:, 0], hexagon_vertices[:, 1], label="Original Hexagon")
+ plt.plot(transformed_hexagon[:, 0], transformed_hexagon[:, 1], label="Transformed 
+Hexagon")
+ plt.legend()
+ plt.grid(True)
+ plt.axis("equal")
+ plt.title("Composite 2D Transformations on a Hexagon")
+ plt.show()
